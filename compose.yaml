@@ -1,0 +1,23 @@
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: "3"
+      tag: '{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}'
+
+services:
+  xatu:
+    container_name: xatu
+    image: ethpandaops/xatu:${XATU_VERSION:-latest}
+    stop_grace_period: 1m
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 100m
+    read_only: true
+    command: |
+      - sentry
+      - --preset ethpandaops
+      - --beacon-node-url=${BN_URL:-http://localhost:5052}
+      - --output-authorization="${AUTH_TOKEN}"
+    <<: *logging
